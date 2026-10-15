@@ -1,0 +1,28 @@
+{
+  "name": "@behavioral-integrity/sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Privacy-preserving client behavioral telemetry SDK for cross-layer integrity verification",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "tsc --noEmit",
+    "test": "npm run build && node --test test/sdk.test.js"
+  },
+  "keywords": [
+    "behavioral-biometrics",
+    "bot-detection",
+    "cybersecurity",
+    "telemetry",
+    "anti-fraud"
+  ],
+  "author": "Behavioral Integrity Research Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.0"
+  }
+}
