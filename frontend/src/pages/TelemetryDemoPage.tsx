@@ -258,6 +258,7 @@ export const TelemetryDemoPage: React.FC<TelemetryDemoPageProps> = ({
         participantId: participantId.trim() || (automationCondition === 'AUTOMATED_VARIABLE' ? 'bot_sim_var' : 'bot_sim_det'),
         taskId: selectedTask,
         label: 1,
+        syntheticOnly: true,
       });
       onRefreshStats();
 

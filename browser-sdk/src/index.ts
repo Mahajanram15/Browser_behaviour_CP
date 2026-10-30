@@ -24,6 +24,7 @@ export class BehavioralSDK {
   private config: Required<SDKConfig>;
   private sessionId: string | null = null;
   private isRunning = false;
+  private syntheticOnly = false;
 
   private buffer: EventBuffer;
   private mouseListener: MouseListener;
@@ -50,8 +51,10 @@ export class BehavioralSDK {
       participantId: config.participantId ?? '',
       taskId: config.taskId ?? 'TASK_01',
       label: config.label ?? (config.collectionMode === 'HUMAN' ? 0 : config.collectionMode === 'AUTOMATED' ? 1 : 0),
+      syntheticOnly: config.syntheticOnly ?? false,
       debug: config.debug ?? false,
     };
+    this.syntheticOnly = this.config.syntheticOnly;
 
     if (config.sessionId) {
       this.sessionId = config.sessionId;
@@ -68,6 +71,10 @@ export class BehavioralSDK {
     });
 
     const enqueueCallback = (event: BehaviorEvent) => {
+      // In synthetic-only mode, ignore physical DOM telemetry
+      if (this.syntheticOnly) {
+        return;
+      }
       this.buffer.enqueue(event);
     };
 
@@ -101,6 +108,12 @@ export class BehavioralSDK {
   public async startSession(options?: SessionStartOptions): Promise<string> {
     if (this.sessionId) {
       return this.sessionId;
+    }
+
+    if (options?.syntheticOnly !== undefined) {
+      this.syntheticOnly = Boolean(options.syntheticOnly);
+    } else {
+      this.syntheticOnly = Boolean(this.config.syntheticOnly ?? false);
     }
 
     const payload = {
@@ -150,14 +163,22 @@ export class BehavioralSDK {
   public async start(options?: SessionStartOptions): Promise<void> {
     if (this.isRunning) return;
 
+    if (options?.syntheticOnly !== undefined) {
+      this.syntheticOnly = Boolean(options.syntheticOnly);
+    } else if (!this.sessionId) {
+      this.syntheticOnly = Boolean(this.config.syntheticOnly ?? false);
+    }
+
     await this.startSession(options);
 
-    // Attach all behavioral listeners
-    this.mouseListener.attach();
-    this.keyboardListener.attach();
-    this.scrollListener.attach();
-    this.navigationListener.attach();
-    this.visibilityListener.attach();
+    // Attach all behavioral listeners ONLY if not in synthetic-only mode
+    if (!this.syntheticOnly) {
+      this.mouseListener.attach();
+      this.keyboardListener.attach();
+      this.scrollListener.attach();
+      this.navigationListener.attach();
+      this.visibilityListener.attach();
+    }
 
     // Attach window lifecycle handlers
     if (typeof window !== 'undefined') {
@@ -167,7 +188,7 @@ export class BehavioralSDK {
 
     this.buffer.startTimer();
     this.isRunning = true;
-    this.log('Behavioral SDK telemetry started');
+    this.log(`Behavioral SDK telemetry started (syntheticOnly=${this.syntheticOnly})`);
   }
 
   /**
@@ -236,6 +257,7 @@ export class BehavioralSDK {
     } finally {
       this.sessionId = null;
       this.buffer.reset();
+      this.syntheticOnly = Boolean(this.config.syntheticOnly ?? false);
     }
   }
 
@@ -245,6 +267,10 @@ export class BehavioralSDK {
 
   public getSessionId(): string | null {
     return this.sessionId;
+  }
+
+  public isSyntheticOnly(): boolean {
+    return this.syntheticOnly;
   }
 
   public getStats(): TelemetryStats {

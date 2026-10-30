@@ -100,6 +100,7 @@ export interface SDKConfig {
   participantId?: string;
   taskId?: string;
   label?: number;
+  syntheticOnly?: boolean; // When true, physical DOM listeners are disabled to prevent operator movements from contaminating synthetic telemetry
   debug?: boolean;
 }
 
@@ -109,6 +110,7 @@ export interface SessionStartOptions {
   participantId?: string;
   taskId?: string;
   label?: number;
+  syntheticOnly?: boolean; // When true, physical DOM listeners are disabled for this session
 }
 
 export interface SessionStartResponse {

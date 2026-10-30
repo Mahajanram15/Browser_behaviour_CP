@@ -297,6 +297,7 @@ export const LearnSphereLandingPage: React.FC<LearnSphereLandingPageProps> = ({
         automationCondition: 'AUTOMATED_DETERMINISTIC',
         taskId: 'TASK_LEARN_AUTOMATION',
         label: 1,
+        syntheticOnly: true,
       });
       const boundSessionId = sdk.getSessionId();
       if (!boundSessionId) {
