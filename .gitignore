@@ -67,3 +67,7 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 pgdata/
+
+# Raw Datasets
+web_bot_detection_dataset/
+*.zip
